@@ -151,7 +151,7 @@ cv2.imwrite("D:/PAP/watershed.jpg", labels)"""
 shape=th3.shape
 t=np.array(th3.flatten())
 cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(
-        t, 2, 2, error=0.005, maxiter=10000, init=None)
+        th3, 2, 2, error=0.005, maxiter=10000, init=None)
 im=[]
 for pix in u.T:
        
