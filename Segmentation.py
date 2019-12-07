@@ -31,7 +31,7 @@ r1=img[:,:,0]
 g1=img[:,:,1]
 b1=img[:,:,2]
 
-"""application of contrast stretching"""
+"""application of contrast stretching
 rnew1=(r1-r1.flatten().min())
 rnew=rnew1/(r1.flatten().max()-r1.flatten().min())*255
 gnew1=(g1-g1.flatten().min())
@@ -48,7 +48,7 @@ plt.show()
 plt.subplot(2,2,1),plt.imshow(img,cmap = 'gray')
 plt.title('Original'), plt.xticks([]), plt.yticks([])
 plt.subplot(2,2,2),plt.imshow(img1,cmap = 'gray')
-plt.title('contrast stretching'), plt.xticks([]), plt.yticks([])
+plt.title('contrast stretching'), plt.xticks([]), plt.yticks([])"""
 
 
 """applying CLAHE to the image- data preprocessing"""
@@ -114,25 +114,21 @@ cv2.imwrite("D:/PAP/sobel.jpg", sobel_rgb)
 
 cimg=sobel.astype('uint8')
 
-detected_circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT,1,20,param1=20,param2=30, minRadius = 1, maxRadius = 40)
+circles = cv2.HoughCircles(cimg,cv2.HOUGH_GRADIENT,1,20,param1=20,param2=30, minRadius = 1, maxRadius = 40)
 
 # Draw circles that are detected. 
-if detected_circles is  not None: 
+circles = np.uint16(np.around(circles))
   
     # Convert the circle parameters a, b and r to integers. 
-    detected_circles = np.uint16(np.around(detected_circles)) 
+    
   
-    for pt in detected_circles[0, :]: 
-        a, b, r = pt[0], pt[1], pt[2] 
-  
-        # Draw the circumference of the circle. 
-        cv2.circle(img, (a, b), r, (0, 255, 0), 2) 
-  
-        # Draw a small circle (of radius 1) to show the center. 
-        cv2.circle(img, (a, b), 1, (0, 0, 255), 3) 
-        cv2.imshow("Detected Circle",img) 
-        cv2.waitKey(0)
-        print(pt[2])
+for i in circles[0, :]: 
+        cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
+    # draw the center of the circle
+        cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
+cv2.imshow('detected circles',cimg)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 """Applying otsu's threshold method"""
 otsu=sobel.astype('uint8')
 ret3,th3 = cv2.threshold(otsu,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
@@ -148,9 +144,9 @@ cv2.imwrite("D:/PAP/watershed.jpg", labels)"""
 
 """Applying Fuzzy C means algorithm"""
 
-shape=th3.shape
+"""shape=th3.shape
 t=np.array(th3.flatten())
-cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(
+cntr, u, u0, d, jm, p, fpc = skfuzzy.cluster.cmeans(
         th3, 2, 2, error=0.005, maxiter=10000, init=None)
 im=[]
 for pix in u.T:
@@ -159,37 +155,20 @@ for pix in u.T:
         
 fuzzy_img = np.reshape(im,shape).astype(np.uint8)
 
-cv2.imwrite("D:/PAP/fuzzy.jpg", fuzzy_img)
+cv2.imwrite("D:/PAP/fuzzy.jpg", fuzzy_img)"""
 
 """Applying watershed algorithm"""
 
 # noise removal
-kernel = np.ones((5,5),np.uint8)
-opening = cv2.morphologyEx(fuzzy_img,cv2.MORPH_OPEN,kernel, iterations = 2)
-
-# sure background area
-sure_bg = cv2.dilate(opening,kernel,iterations=3)
-# Finding sure foreground area
-dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
-ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
-
-sure_fg = np.uint8(sure_fg)
-unknown = cv2.subtract(sure_bg,sure_fg)
-
-
-# Marker labelling
-ret, markers = cv2.connectedComponents(sure_fg)
-
-# Add one to all labels so that sure background is not 0, but 1
-markers = markers+1
-
-# Now, mark the region of unknown with zero
-markers[unknown==255] = 0
-
-markers = cv2.watershed(img,markers)
-img[markers == -1] = [255,0,0]
-
-cv2.imwrite("D:/PAP/watershed.jpg", markers)
-
-
-
+# compute the exact Euclidean distance from every binary
+# pixel to the nearest zero pixel, then find peaks in this
+# distance map
+D = ndimage.distance_transform_edt(th3)
+localMax = peak_local_max(D, indices=False, min_distance=20,
+	labels=th3)
+ 
+# perform a connected component analysis on the local peaks,
+# using 8-connectivity, then appy the Watershed algorithm
+markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
+labels = watershed(-D, markers, mask=th3)
+cv2.imwrite("D:/PAP/watershed1.jpg", labels)
