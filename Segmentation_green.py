@@ -48,8 +48,9 @@ import scipy.ndimage
 import scipy.signal
 import matplotlib.pyplot as plt
 from skimage import color, io
+path='C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X'
 
-for i in os.listdir('C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X' ):
+for i in os.listdir('C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X'):
     
     
     img=cv2.imread('C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X/'+str(i))
@@ -58,23 +59,25 @@ for i in os.listdir('C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X' ):
     r1=img[:,:,0]
     g1=img[:,:,1]
     b1=img[:,:,2]
-    cv2.imwrite("D:/PAP/green_channel.jpg", g1)
-    
-    
+    #cv2.imwrite("D:/PAP/green_channel.jpg", g1)
+ 
+    print(i)
+    n=i[:-4]
+    print(n)
     
     
     sobelx = cv2.Sobel(g1,cv2.CV_32F,1,0,ksize=3) 
     sobely=  cv2.Sobel(g1,cv2.CV_32F,0,1,ksize=3) 
     sobel=sobelx+sobely
-    cv2.imwrite("D:/PAP/Sobel_Green.jpg", sobel)
+    #cv2.imwrite("D:/PAP/Sobel_Green.jpg", sobel)
     
     canny=cv2.Canny(g1,1,2)
-    cv2.imwrite("D:/PAP/canny_edge_detector_green.jpg", canny)
+    #cv2.imwrite("D:/PAP/canny_edge_detector_green.jpg", canny)
     
     """Binarizing"""
     
     ret1,th1 = cv2.threshold(g1,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    cv2.imwrite("D:/PAP/otsu_green.jpg", th1) 
+    #cv2.imwrite("D:/PAP/otsu_green.jpg", th1) 
     """phi = np.random.randn(2748,3584) # initial value for phi F = ... # some function dt = 1
     dt = 100
     F=1"""
@@ -222,7 +225,7 @@ for i in os.listdir('C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X' ):
     #image_2= cv2.dilate(Final_output,kernel=kernel,iterations=5)
     #image_3= cv2.erode(Final_output,kernel=kernel,iterations=2)
     
-    cv2.imwrite("C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X/"+str(i)+"_output.jpg",Final_output )
+    cv2.imwrite('C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X/'+n+"_output.jpg",Final_output )
     
     #cv2.imwrite("D:/PAP/superimposed_green_dilated.jpg",image_2 )
     
