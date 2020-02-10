@@ -63,9 +63,9 @@ for i in os.listdir('C:/Users/Soham Dutta/Desktop/Pictures/2-01-2019/40X'):
  
     print(i)
     n=i[:-4]
-    print(n)
     
     
+   
     sobelx = cv2.Sobel(g1,cv2.CV_32F,1,0,ksize=3) 
     sobely=  cv2.Sobel(g1,cv2.CV_32F,0,1,ksize=3) 
     sobel=sobelx+sobely
